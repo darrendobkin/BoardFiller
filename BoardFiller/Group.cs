@@ -29,7 +29,7 @@ namespace BoardFiller
             {
                 if (b != fromBox)
                 {
-                    b.AddAvailableVal(this, val);
+                    b.AddAvailableVal(this, fromBox, val);
                 }
             }
         }
@@ -56,11 +56,11 @@ namespace BoardFiller
         /// </summary>
         /// <param name="val">The int value to look for</param>
         /// <returns>True if value is in use.</returns>
-        public bool IsValueInUse(int val)
+        public bool IsValueInUse(int val, Box exceptForBox = null)
         {
             foreach (Box b in boxes)
             {
-                if (b.curValue == val)
+                if ((b != exceptForBox) && (b.curValue == val))
                     return true;
             }
             return false;

@@ -12,25 +12,27 @@ namespace BoardFiller
     /// </summary>
     public class Box
     {
+        private int boxIndex;
+
         public int? curValue { get; set; }
 
         // Row, column, and square for this box.
         List<Group> groups = new List<Group>(3);
 
-        // reference to The Board
-        Board board;
-
         // available possible values
         List<int> availableVals = new List<int>();
 
+        // old picks
+        List<int> oldPicks = new List<int>();
+
         // c'tor
-        public Box(Board theBoard)
+        public Box(int idx)
         {
-            board = theBoard;
+            boxIndex = idx;
 
             ResetValue();
 
-            for (int i=1; i<=9; i++)
+            for (int i = 1; i <= 9; i++)
             {
                 availableVals.Add(i);
             }
@@ -61,29 +63,59 @@ namespace BoardFiller
                 }
             }
 
+            Console.WriteLine("ResetValue(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
+
             // return true if out of options
             return availableVals.Count == 0;
         }
 
-        // Redo the available collection based on 
+        // Redo the available collection based on my groups
         public void RecalcAvailable()
         {
+            if (boxIndex == 20) { int i = 0; }
 
+            availableVals.Clear();
+
+            for (int i = 1; i <= 9; i++)
+            {
+                bool fOK = true;
+
+                foreach (Group g in groups)
+                {
+                    if (g.IsValueInUse(i))
+                    {
+                        fOK = false;
+                        break;
+                    }
+                }
+
+                if (fOK)
+                {
+                    availableVals.Add(i);
+                }
+            }
+
+            Console.WriteLine("RecalcAvailable(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
         }
 
         /// <summary>
         /// A group is notifying this box that a value previously in use is now available to the group.  Consider it
-        /// to be available this box if it does not conflict with one of this box's other groups.
+        /// to be available to this box if it does not conflict with one of this box's other groups.
         /// </summary>
         /// <param name="fromGroup"></param>
         /// <param name="val"></param>
-        public void AddAvailableVal(Group fromGroup, int val)
+        public void AddAvailableVal(Group fromGroup, Box fromBox, int val)
         {
             bool fOK = true;
 
+            // Don't add values released by later boxes that I've already picked before.
+            if ((fromBox.boxIndex > boxIndex) && oldPicks.Contains(val))
+                return;
+
             foreach (Group g in groups)
             {
-                if (g != fromGroup && g.IsValueInUse(val))
+                //if (g != fromGroup && g.IsValueInUse(val, fromBox))
+                if (g.IsValueInUse(val, fromBox))
                 {
                     fOK = false;
                     break;
@@ -103,6 +135,8 @@ namespace BoardFiller
         /// <param name="val"></param>
         public void RemoveAvailableVal(int iVal)
         {
+            if (boxIndex == 20) { int i = 0; }
+
             Debug.Assert(curValue != iVal);
 
             availableVals.Remove(iVal);
@@ -128,6 +162,8 @@ namespace BoardFiller
             // if I already have a value, let my groups know I'm giving it up
             if (curValue != null)
             {
+                if (boxIndex == 11) { int i = 0; }
+
                 foreach (Group g in groups)
                 {
                     g.ValueIsAvailable(this, curValue.GetValueOrDefault());
@@ -135,7 +171,12 @@ namespace BoardFiller
             }
 
             curValue = iVal;
+
+            if (boxIndex == 20) { int i = 0; }
+
             availableVals.Remove(iVal);
+            oldPicks.Add(iVal);
+
             foreach (Group g in groups)
             {
                 g.ValueIsUnavailable(this, iVal);

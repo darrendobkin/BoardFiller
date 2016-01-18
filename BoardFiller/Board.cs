@@ -35,7 +35,7 @@ namespace BoardFiller
             {
                 for (int i = 0; i < 9; i++)
                 {
-                    Box newBox = new Box(this);
+                    Box newBox = new Box((j*9)+i);
                     boxes[i, j] = newBox;
                     cols[i].AddBox(newBox);
                     newBox.AssignToGroup(cols[i]);
@@ -59,15 +59,11 @@ namespace BoardFiller
                 }
                 else
                 {
-                    bool fContinueBacktracking;
-
-                    do
+                    if (GetBox(iPick).ResetValue())
                     {
-                        if (fContinueBacktracking = GetBox(iPick).ResetValue())
-                        {
-                            iPick--;
-                        }
-                    } while (fContinueBacktracking);
+                        GetBox(iPick + 1).RecalcAvailable();
+                    }
+                    iPick--;
                 }
                 Dump();
             } while (iPick < 81);
