@@ -28,7 +28,12 @@ namespace BoardFiller
         {
             board = theBoard;
 
-            Reset();
+            ResetValue();
+
+            for (int i=1; i<=9; i++)
+            {
+                availableVals.Add(i);
+            }
         }
 
         /// <summary>
@@ -41,26 +46,29 @@ namespace BoardFiller
         }
 
         /// <summary>
-        /// Discard current value.  Re-initialize set of available values.  Tell all my groups
-        /// old value is now available.
+        /// Discard current value.  Tell all my groups old value is now available.
         /// </summary>
-        private void Reset()
+        public bool ResetValue()
         {
             if (curValue != null)
             {
                 int oldVal = curValue.GetValueOrDefault();
                 curValue = null;
-                availableVals.Clear();
 
                 foreach (Group g in groups)
                 {
                     g.ValueIsAvailable(this, oldVal);
                 }
             }
-            for (int i = 1; i <=9; i++)
-            {
-                availableVals.Add(i);
-            }
+
+            // return true if out of options
+            return availableVals.Count == 0;
+        }
+
+        // Redo the available collection based on 
+        public void RecalcAvailable()
+        {
+
         }
 
         /// <summary>
@@ -109,12 +117,13 @@ namespace BoardFiller
         {
             if (availableVals.Count == 0)
             {
-                Reset();
                 return false;
             }
 
-            Random random = new Random();
-            int iVal = availableVals[random.Next(0, availableVals.Count)];
+            //Random random = new Random();
+            //int iVal = availableVals[random.Next(0, availableVals.Count)];
+
+            int iVal = availableVals.First<int>();
 
             // if I already have a value, let my groups know I'm giving it up
             if (curValue != null)

@@ -16,12 +16,12 @@ namespace BoardFiller
         Group[] cols = new Group[9];
         Group[] squares = new Group[9];
 
-        // must make 81 valid picks to fill board
-        int iPick = 0;
-
         // c'tor
         public Board()
         {
+            // must make 81 valid picks to fill board
+            int iPick = 0;
+
             // create the groups
             for (int i = 0; i < 9; i++)
             {
@@ -52,18 +52,51 @@ namespace BoardFiller
             // Keep making picks until board is filled
             do
             {
-                int iRow = iPick / 9;
-                int iCol = iPick - (iRow * 9);
-
-                if (boxes[iRow, iCol].MakePick())
+                Box box = GetBox(iPick);
+                if (box.MakePick())
                 {
                     iPick++;
                 }
                 else
                 {
-                    iPick--;
+                    bool fContinueBacktracking;
+
+                    do
+                    {
+                        if (fContinueBacktracking = GetBox(iPick).ResetValue())
+                        {
+                            iPick--;
+                        }
+                    } while (fContinueBacktracking);
                 }
+                Dump();
             } while (iPick < 81);
+        }
+
+        Box GetBox(int iPick)
+        {
+            int iRow = iPick / 9;
+            int iCol = iPick - (iRow * 9);
+
+            return boxes[iCol, iRow];
+        }
+
+        public void Dump()
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    int? iVal = boxes[i, j].curValue;
+
+                    if (iVal == null)
+                        Console.Write(". ");
+                    else
+                        Console.Write(boxes[i, j].curValue.ToString() + " ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine("==================");
         }
     }
 }
