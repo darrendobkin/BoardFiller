@@ -63,7 +63,7 @@ namespace BoardFiller
                 }
             }
 
-            Console.WriteLine("ResetValue(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
+            // Console.WriteLine("ResetValue(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
 
             // return true if out of options
             return availableVals.Count == 0;
@@ -95,7 +95,7 @@ namespace BoardFiller
                 }
             }
 
-            Console.WriteLine("RecalcAvailable(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
+            // Console.WriteLine("RecalcAvailable(" + boxIndex.ToString() + "), avail.Count=" + availableVals.Count.ToString());
         }
 
         /// <summary>
@@ -154,10 +154,10 @@ namespace BoardFiller
                 return false;
             }
 
-            //Random random = new Random();
-            //int iVal = availableVals[random.Next(0, availableVals.Count)];
+            Random random = new Random();
+            int iVal = availableVals[random.Next(0, availableVals.Count)];
 
-            int iVal = availableVals.First<int>();
+            //int iVal = availableVals.First<int>();
 
             // if I already have a value, let my groups know I'm giving it up
             if (curValue != null)

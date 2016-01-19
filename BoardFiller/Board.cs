@@ -65,8 +65,9 @@ namespace BoardFiller
                     }
                     iPick--;
                 }
-                Dump();
             } while (iPick < 81);
+            Dump();
+            Console.ReadKey();
         }
 
         Box GetBox(int iPick)
